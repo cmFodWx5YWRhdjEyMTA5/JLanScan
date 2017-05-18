@@ -6,8 +6,16 @@
  */
 package jlanscan;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -330,6 +338,12 @@ public class LanScanFrame extends javax.swing.JFrame {
     /*
      * attributes & methods
      */
+    String ipV4;
+    String ipV6;
+    int cidr;
+    String broadCast;
+    String hostName;
+    
     IPrange netRange = new IPrange();
     ArrayList<String> r = netRange.getRange();    
     
@@ -358,8 +372,11 @@ public class LanScanFrame extends javax.swing.JFrame {
     //LanScanFrame frame;
     
     
+    
+    
     //performing ip scan
      public void StartIPscan() throws InterruptedException {
+         this.getInetConfig();
         String ipFrom = ipTextFrom.getText();
         String ipTo = ipTextTo.getText(); 
         netRange.setFromip(ipFrom);
@@ -541,6 +558,52 @@ public class LanScanFrame extends javax.swing.JFrame {
         {
             allPorts.add(Integer.parseInt(portRange));
         }        
+    }
+     
+    /*
+    * getting interface configuration ipv4 & ipv6
+    */
+    public void getInetConfig() {
+        Enumeration<NetworkInterface> networkInterfaces = null;
+        try {
+            networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = networkInterfaces.nextElement();
+            try {
+                for (InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
+                    System.out.println(address.getAddress().getHostAddress());
+                    if(isValidIPv4(address.getAddress().getHostAddress())) {
+                        ipV4 = address.getAddress().getHostAddress();
+                        cidr = address.getNetworkPrefixLength();
+                        broadCast = address.getBroadcast().toString().replaceAll("^/", "");
+                        continue;
+                    } 
+                    if(address.getAddress().isLinkLocalAddress()) {
+                        ipV6 = address.getAddress().getHostAddress();                    
+                        continue;
+                    }
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
+        
+//        System.out.println(ipV4 + " " + cidr + " " + broadCast);
+//        System.out.println(ipV6);
+    }
+    
+    public boolean isValidIPv4(String ip) {        
+        //checking for loopback address
+        if(ip.substring(0, 3).equals("127")) {
+            return false;
+        }
+        //ipv4 reg expression
+        String PATTERN = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
+        System.out.println(ip + " " + ip.matches(PATTERN));
+        return ip.matches(PATTERN);
     }
     
      //about box 
