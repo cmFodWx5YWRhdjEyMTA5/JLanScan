@@ -459,7 +459,7 @@ public class LanScanFrame extends javax.swing.JFrame {
         
 //        System.out.println("Performing port scan!" + PTHREADS + " " + range);       
         
-        portOutputText.append("Scanning for open ports on "+"\""+ipAddress+"\""+"..."+"\n");        
+        portOutputText.setText("Scanning for open ports on "+"\""+ipAddress+"\""+"..."+"\n");        
          
          //Initializing threds
         for(int i = 0; i < PTHREADS; i++)
