@@ -12,10 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import jlanscan.Node;
 
-/**
- *
- * @author jorge
- */
 public class IPscannerRunnable implements Runnable {
     int startIp, stopIp;
     String subnet;
