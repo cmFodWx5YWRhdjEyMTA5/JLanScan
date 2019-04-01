@@ -22,12 +22,28 @@ import javax.swing.JOptionPane;
 
 
 public class LanScanFrame extends javax.swing.JFrame {
+    
+    /*
+     * attributes & methods
+     */
+    String ipV4;
+    String ipV6;
+    int cidr;
+    String broadCast;
+    String hostName;
+    String ipAddress;
+    String subnet;
+    String router;
+    String mac;
+    IPrange netRange = new IPrange();
+    ArrayList<String> r = netRange.getRange();  
+    NetworkInterface networkInterface;
 
     /**
      * Creates new form LanScanFrame
      */
-    public LanScanFrame() {
-        initComponents();
+    public LanScanFrame() throws UnknownHostException {
+        initComponents();        
     }
 
     /**
@@ -58,6 +74,8 @@ public class LanScanFrame extends javax.swing.JFrame {
         clearIpButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         ipOutputText = new javax.swing.JTextArea();
+        jPanel3 = new javax.swing.JPanel();
+        jLabelipConfig = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         FileMenu = new javax.swing.JMenu();
         ExitMenu = new javax.swing.JMenuItem();
@@ -102,9 +120,9 @@ public class LanScanFrame extends javax.swing.JFrame {
                 .addComponent(ipPortText, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(portInputText, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(portScanButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(portCleanButton, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -132,6 +150,12 @@ public class LanScanFrame extends javax.swing.JFrame {
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel3.setText("IP Range     From:");
+
+        ipTextFrom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ipTextFromActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel4.setText("To:");
@@ -166,27 +190,44 @@ public class LanScanFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(scanButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(clearIpButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(clearIpButton, javax.swing.GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ipTextFrom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ipTextTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(scanButton)
                     .addComponent(clearIpButton))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
 
-        ipOutputText.setColumns(20);
         ipOutputText.setEditable(false);
+        ipOutputText.setColumns(20);
         ipOutputText.setRows(5);
         jScrollPane2.setViewportView(ipOutputText);
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("IP Configuration"));
+
+        jLabelipConfig.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabelipConfig.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabelipConfig.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabelipConfig, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabelipConfig, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
         FileMenu.setText("File");
         FileMenu.addActionListener(new java.awt.event.ActionListener() {
@@ -223,31 +264,40 @@ public class LanScanFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
-                    .addComponent(jSeparator1)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSeparator1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(4, 4, 4)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 7, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
+                .addContainerGap())
         );
+
+        jPanel3.getAccessibleContext().setAccessibleName("");
+        jPanel3.getAccessibleContext().setAccessibleDescription("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -269,6 +319,8 @@ public class LanScanFrame extends javax.swing.JFrame {
         try {
             StartIPscan();
         } catch (InterruptedException ex) {
+            Logger.getLogger(LanScanFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SocketException ex) {
             Logger.getLogger(LanScanFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_scanButtonActionPerformed
@@ -292,62 +344,33 @@ public class LanScanFrame extends javax.swing.JFrame {
         showAboutBox();
     }//GEN-LAST:event_AboutMenuActionPerformed
 
+    private void ipTextFromActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ipTextFromActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ipTextFromActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /*
-         * Set the Nimbus look and feel
-         */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /*
-         * If Nimbus (introduced in Java SE 6) is not available, stay with the
-         * default look and feel. For details see
-         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LanScanFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LanScanFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LanScanFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LanScanFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /*
-         * Create and display the form
-         */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
+               
+         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new LanScanFrame().setVisible(true);
+                try {
+                    new LanScanFrame().setVisible(true);
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(LanScanFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
     
-    /*
-     * attributes & methods
-     */
-    String ipV4;
-    String ipV6;
-    int cidr;
-    String broadCast;
-    String hostName;
+      
     
-    IPrange netRange = new IPrange();
-    ArrayList<String> r = netRange.getRange();    
+        
+        
+        
     
-    
+     
     //ipThreads is the number of threads to spawn for scanning
     int IPTHREADS;
     int range;
@@ -369,14 +392,12 @@ public class LanScanFrame extends javax.swing.JFrame {
     int endPort;
     
     
-    //LanScanFrame frame;
-    
     
     
     
     //performing ip scan
-     public void StartIPscan() throws InterruptedException {
-         this.getInetConfig();
+     public void StartIPscan() throws InterruptedException, SocketException {
+        this.getInetConfig();
         String ipFrom = ipTextFrom.getText();
         String ipTo = ipTextTo.getText(); 
         netRange.setFromip(ipFrom);
@@ -394,47 +415,44 @@ public class LanScanFrame extends javax.swing.JFrame {
         
         System.out.println(Integer.toString(IPTHREADS));
         //Initializing threds
-        for(int i = 0; i < IPTHREADS-1; i++)
-        {
-            System.out.println("starting threads");
-            //creating ArrayList containing a sublist of r (adjusting range of ip)
-            System.out.println(i + " " + startIp + ", " + endIp);
-            ipScan[i] = new IPscanner(startIp, endIp, subnet, ipOutputText);
-            tIp[i] = new Thread(ipScan[i]);  
-            startIp = endIp;
-            endIp = startIp + range;
-            
-        }
+//        for(int i = 0; i < IPTHREADS-1; i++)
+//        {
+//            System.out.println("starting threads");
+//            //creating ArrayList containing a sublist of r (adjusting range of ip)
+//            System.out.println(i + " " + startIp + ", " + endIp);
+//            ipScan[i] = new IPscanner(startIp, endIp, subnet, ipOutputText);
+//            tIp[i] = new Thread(ipScan[i]);  
+//            startIp = endIp;
+//            endIp = startIp + range;
+//            
+//        }
         
         //output to interface ip scanning started
-        ipOutputText.append("Scanning network "+"\""+ subnet + startIp +"...\""+"\n");
-        
-        //starting threds
-        for(int i = 0; i < IPTHREADS-1; i++) 
-        {
-            tIp[i].start();
-        }
-        
-        //wait for a sec
-        Thread.sleep(1000);
-        
-        //collecting threads result
-        for(int i = 0; i < IPTHREADS-1; i++)
-        {
-            tIp[i].join();
-        } 
-        
-        //retrieving total number of host detected        
-        for(int i = 0; i < IPTHREADS-1; i++)
-        {
-            totalHost += ipScan[i].getLiveHosts();
-        }
-        
-        ipOutputText.append("\n======  Results  ======\n");
-        ipOutputText.append("Number of hosts detected: " + totalHost);
-        
-        
-             
+//        ipOutputText.append("Scanning network "+"\""+ subnet + startIp +"...\""+"\n");
+//        
+//        //starting threds
+//        for(int i = 0; i < IPTHREADS-1; i++) 
+//        {
+//            tIp[i].start();
+//        }
+//        
+//        //wait for a sec
+//        Thread.sleep(1000);
+//        
+//        //collecting threads result
+//        for(int i = 0; i < IPTHREADS-1; i++)
+//        {
+//            tIp[i].join();
+//        } 
+//        
+//        //retrieving total number of host detected        
+//        for(int i = 0; i < IPTHREADS-1; i++)
+//        {
+//            totalHost += ipScan[i].getLiveHosts();
+//        }
+//        
+//        ipOutputText.append("\n======  Results  ======\n");
+//        ipOutputText.append("Number of hosts detected: " + totalHost);            
     }
      
      //performing port scan
@@ -459,7 +477,7 @@ public class LanScanFrame extends javax.swing.JFrame {
         
 //        System.out.println("Performing port scan!" + PTHREADS + " " + range);       
         
-        portOutputText.setText("Scanning for open ports on "+"\""+ipAddress+"\""+"..."+"\n");        
+        portOutputText.append("Scanning for open ports on "+"\""+ipAddress+"\""+"..."+"\n");        
          
          //Initializing threds
         for(int i = 0; i < PTHREADS; i++)
@@ -563,7 +581,8 @@ public class LanScanFrame extends javax.swing.JFrame {
     /*
     * getting interface configuration ipv4 & ipv6
     */
-    public void getInetConfig() {
+    public void getInetConfig() throws SocketException {
+        String output = "";
         Enumeration<NetworkInterface> networkInterfaces = null;
         try {
             networkInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -573,11 +592,13 @@ public class LanScanFrame extends javax.swing.JFrame {
         while (networkInterfaces.hasMoreElements()) {
             NetworkInterface networkInterface = networkInterfaces.nextElement();
             try {
-                for (InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
-                    System.out.println(address.getAddress().getHostAddress());
-                    if(isValidIPv4(address.getAddress().getHostAddress())) {
-                        ipV4 = address.getAddress().getHostAddress();
+                for (InterfaceAddress address : networkInterface.getInterfaceAddresses()) {                      
+                    if(!networkInterface.getDisplayName().contains("VirtualBox") && isValidIPv4(address.getAddress().getHostAddress())) {
+                        System.out.println(networkInterface.getDisplayName().toString() + " " + address.toString());
+                        ipV4 = address.getAddress().getHostAddress();                        
                         cidr = address.getNetworkPrefixLength();
+                        NetworkInterface inFace = NetworkInterface.getByInetAddress(address.getAddress());
+                        mac = macToString(inFace.getHardwareAddress());
                         broadCast = address.getBroadcast().toString().replaceAll("^/", "");
                         continue;
                     } 
@@ -589,10 +610,24 @@ public class LanScanFrame extends javax.swing.JFrame {
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }
-        }
+        }     
+        
+        output = "<html>" + "IP v4: " + "<br>" + ipV4 + "/" + cidr + "<br>" +
+                "MAC: " + mac.toString() + "<br>" +
+                "Broadcast: " + "<br>" + broadCast + "</html>";        
+        jLabelipConfig.setText(output);             
+        
         
 //        System.out.println(ipV4 + " " + cidr + " " + broadCast);
 //        System.out.println(ipV6);
+    }
+    
+    public String macToString(byte m[]) {
+        String tempMac = "";
+        for (int k = 0; k < m.length; k++) {
+            tempMac.format("%02X%s", m[k], (k < m.length - 1) ? "-" : "");
+        }
+        return tempMac;
     }
     
     public boolean isValidIPv4(String ip) {        
@@ -602,7 +637,7 @@ public class LanScanFrame extends javax.swing.JFrame {
         }
         //ipv4 reg expression
         String PATTERN = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
-        System.out.println(ip + " " + ip.matches(PATTERN));
+//        System.out.println(ip + " " + ip.matches(PATTERN));
         return ip.matches(PATTERN);
     }
     
@@ -638,9 +673,11 @@ public class LanScanFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabelipConfig;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;

@@ -36,11 +36,7 @@ public class IPrange {
     //convert from String ip to int[] ip
     public void StrToIP()
     {
-        if(from == "" || from == null)
-        {
-            this.showEnterIpMessage();
-            return;
-        }
+        
         //spliting strings
         String[] temp1 = from.split("\\.");
         String[] temp2 = to.split("\\.");

@@ -16,17 +16,25 @@ import java.net.UnknownHostException;
 public class Node {
     String ip;
     String mac;
-    String CanonicalHostName;
-    String HostName;
+    String canonicalHostName;
+    String hostName;
     String remark;
     boolean isReachable;
     int progressBar;
 
-    public Node() { }
-
-    Node(String ip, String mac, int progressBar){
+    public Node(String ip) { 
         this.ip = ip;
-        this.isReachable = true;
+    }
+    
+    public Node(String ip, String mac) {
+        this.ip = ip;
+        this.mac = mac;
+    }
+
+    public Node(String ip, String mac, String hostname, int progressBar){
+        this.ip = ip;
+        this.mac = mac;
+        this.hostName = hostname;
         this.progressBar = progressBar;        
     }
 
@@ -39,7 +47,7 @@ public class Node {
     }
 
     public String getHostName() {
-        return HostName;
+        return hostName;
     }
 
     public String getMac() {
@@ -58,9 +66,6 @@ public class Node {
     public String toString() {
         return "IP: " + ip + "\n" +
                 "MAC: " + mac + "\n" +
-                "CanonicalHostName:\t" + CanonicalHostName + "\n" +
-                "HostName:\t" + HostName + "\n" +
-                "isReachable: " + isReachable +
-                "\n" + remark;
+                "HostName:\t" + hostName;
     }
 }
