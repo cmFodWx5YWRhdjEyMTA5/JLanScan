@@ -3,13 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package jlanscan;
+package jlanscan.runnable;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import jlanscan.Node;
 
 /**
  *
@@ -38,15 +39,9 @@ public class IPscannerRunnable implements Runnable {
             try {
                 InetAddress ipAdd = InetAddress.getByName(ip);
                 System.out.println(ipAdd.getHostAddress());
-//                if(ipAdd.isReachable(TIMEOUT)) {
-////                    System.out.println(ipAdd.getHostAddress() +" is up");
-//                    liveHosts.add(new Node(ip));
-//                }
                 byte[] ipBytes = ipAdd.getAddress();
                 socket.setTcpNoDelay(true);                
-                socket.connect(new InetSocketAddress(InetAddress.getByAddress(ipBytes), PORT), TIMEOUT);
-//                System.out.println(ipAdd.getHostAddress() +" is up");
-//                liveHosts.add(new Node(ip));                
+                socket.connect(new InetSocketAddress(InetAddress.getByAddress(ipBytes), PORT), TIMEOUT);              
             }
             catch (Exception ex){
 
